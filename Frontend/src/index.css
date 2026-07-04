@@ -1,0 +1,249 @@
+@import "tailwindcss";
+
+/* ── Dark mode via class on <html> ──────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── Light theme tokens ─────────────────────────────────── */
+:root {
+  --canvas:       #F8FAFC;
+  --card:         #FFFFFF;
+  --card-2:       #F1F5F9;
+  --border:       #E2E8F0;
+  --border-2:     #CBD5E1;
+  --text-1:       #0F172A;
+  --text-2:       #475569;
+  --text-3:       #94A3B8;
+  --input-bg:     #F8FAFC;
+  --input-border: #CBD5E1;
+  --nav-bg:       rgba(255,255,255,0.85);
+  --shadow:       0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+
+  /* Brand */
+  --primary:      #0EA5E9;
+  --primary-dim:  rgba(14,165,233,0.12);
+  --primary-glow: rgba(14,165,233,0.35);
+  --success:      #10B981;
+  --success-dim:  rgba(16,185,129,0.12);
+  --warning:      #F59E0B;
+  --warning-dim:  rgba(245,158,11,0.12);
+  --danger:       #EF4444;
+  --danger-dim:   rgba(239,68,68,0.12);
+  --indigo:       #818CF8;
+}
+
+/* ── Dark theme overrides ───────────────────────────────── */
+html.dark {
+  /* Surfaces */
+  --canvas:       #1E1E2E;
+  --card:         #26263A;
+  --card-2:       #1C1C2E;
+  --border:       #3A3A54;
+  --border-2:     #4E4E6A;
+
+  /* Text */
+  --text-1:       #FFFFFF;
+  --text-2:       #A0A0A0;
+  --text-3:       #6A6A8A;
+
+  /* Inputs */
+  --input-bg:     #1C1C2E;
+  --input-border: #3A3A54;
+
+  /* Nav + shadow */
+  --nav-bg:       rgba(30, 30, 46, 0.88);
+  --shadow:       0 8px 32px rgba(0, 0, 0, 0.5);
+
+  /* Brand — rose accent in dark mode */
+  --primary:      #C0395A;
+  --primary-dim:  rgba(192, 57, 90, 0.15);
+  --primary-glow: rgba(192, 57, 90, 0.4);
+
+  /* Semantic */
+  --success:      #22C55E;
+  --success-dim:  rgba(34, 197, 94, 0.15);
+  --warning:      #EAB308;
+  --warning-dim:  rgba(234, 179, 8, 0.15);
+  --danger:       #EF4444;
+  --danger-dim:   rgba(239, 68, 68, 0.15);
+
+  /* Indigo stays */
+  --indigo:       #818CF8;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--canvas);
+  color: var(--text-1);
+  font-family: 'Inter', 'Roboto', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+input, select, textarea { outline: none; }
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+input[type=number] { -moz-appearance: textfield; }
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ── Custom Scrollbar for Mobile Tables ─────────────────── */
+.custom-scrollbar {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--border) transparent !important;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px !important;
+  width: 6px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border) !important;
+  border-radius: 99px !important;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--border-2) !important;
+}
+
+/* ── Responsive Paper Basics Grid ──────────────────────── */
+.paper-basics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 14px 18px 16px;
+}
+@media (max-width: 640px) {
+  .paper-basics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+/* ── Action Bar Single Row Layout ───────────────────────── */
+.action-bar {
+  flex-wrap: nowrap !important;
+}
+@media (max-width: 480px) {
+  .action-bar {
+    padding: 0.75rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+  .action-bar-btn {
+    padding: 8px 10px !important;
+    font-size: 0.75rem !important;
+    gap: 4px !important;
+  }
+  .action-bar-btn svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+/* ── Interactive Timeline Styles ── */
+.timeline-container-line {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  bottom: 20px;
+  width: 3px;
+  background-color: var(--border);
+  transform: translateX(-50%);
+  border-radius: 99px;
+  z-index: 1;
+}
+
+.timeline-progress-line {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  bottom: 20px;
+  width: 3px;
+  background: var(--primary);
+  transform: translateX(-50%);
+  transform-origin: top;
+  border-radius: 99px;
+  z-index: 2;
+}
+
+.timeline-dot-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 4px;
+  width: 20px;
+  height: 20px;
+  z-index: 5;
+}
+
+.timeline-item {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.timeline-card {
+  width: 44%;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  position: relative;
+  z-index: 10;
+}
+
+.timeline-empty {
+  width: 44%;
+}
+
+@media (max-width: 768px) {
+  .timeline-container-line {
+    left: 20px !important;
+    transform: none !important;
+  }
+  .timeline-progress-line {
+    left: 20px !important;
+    transform: none !important;
+  }
+  .timeline-dot-wrapper {
+    left: 20px !important;
+    transform: translateX(-50%) !important;
+  }
+  .timeline-item {
+    flex-direction: row-reverse !important;
+    justify-content: flex-start !important;
+    gap: 24px;
+    padding-left: 20px;
+  }
+  .timeline-card {
+    width: calc(100% - 40px) !important;
+    text-align: left !important;
+  }
+  .timeline-empty {
+    display: none !important;
+  }
+}
+
+/* ── Spinner Animation (for generation modal) ──────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Preview Page Responsive Layout ────────────────────── */
+@media (max-width: 768px) {
+  .preview-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
