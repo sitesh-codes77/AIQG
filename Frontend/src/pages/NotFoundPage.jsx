@@ -14,7 +14,7 @@ export default function NotFoundPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/')}>
             <NotebookText size={22} color="#0EA5E9" />
             <span style={{ fontWeight: 800, fontSize: '1.25rem', color: '#0EA5E9', letterSpacing: '-0.02em' }}>
-              EduGen
+              AIQG
             </span>
           </div>
 

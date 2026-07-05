@@ -189,12 +189,12 @@ export default function LoginPage() {
                 style={{
                   fontWeight: 800,
                   fontSize: "1.2rem",
-                  background: "linear-gradient(90deg,#0EA5E9,#818CF8)",
+                  background: "linear-gradient(90deg, var(--primary), var(--indigo))",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                EduGen
+                AIQG
               </span>
             </div>
             <h1

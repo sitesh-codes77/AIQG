@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react'
+import { Loader2, BookOpen, PenTool, BrainCircuit, FileCheck } from 'lucide-react'
 
 const GENERATION_STEPS = [
-  { text: 'Initializing AI Agent...', icon: '🤖' },
-  { text: 'Fetching content from chapters...', icon: '📚' },
-  { text: 'Composing questions...', icon: '✍️' },
-  { text: 'Running quality review...', icon: '🔍' },
-  { text: 'Generating PDF...', icon: '📄' },
+  { text: 'Initializing AI Agent...', Icon: Loader2 },
+  { text: 'Fetching content from chapters...', Icon: BookOpen },
+  { text: 'Composing questions...', Icon: PenTool },
+  { text: 'Running quality review...', Icon: BrainCircuit },
+  { text: 'Generating PDF...', Icon: FileCheck },
 ]
 
 export default function AsyncGenerateModal({ onComplete }) {
@@ -28,6 +29,7 @@ export default function AsyncGenerateModal({ onComplete }) {
   }, [onComplete])
 
   const progress = ((currentIdx + 1) / GENERATION_STEPS.length) * 100
+  const CurrentIcon = GENERATION_STEPS[currentIdx].Icon
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.82)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300, backdropFilter: 'blur(10px)' }}>
@@ -40,7 +42,12 @@ export default function AsyncGenerateModal({ onComplete }) {
             borderTopColor: 'var(--primary)',
             animation: 'spin 1s linear infinite',
           }} />
-          <span style={{ fontSize: '1.6rem' }}>{GENERATION_STEPS[currentIdx].icon}</span>
+          <CurrentIcon
+            size={28}
+            color="var(--primary)"
+            className={currentIdx === 0 ? "animate-spin" : ""}
+            style={{ transition: 'all 0.3s' }}
+          />
         </div>
 
         <h2 style={{ color: 'var(--text-1)', fontWeight: 800, fontSize: '1.2rem', marginBottom: '0.5rem' }}>

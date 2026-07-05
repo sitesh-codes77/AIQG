@@ -39,27 +39,13 @@ function distributeQuestionsAndMarks(tqStr, tmStr) {
 
   if (tq <= 0 || tm <= 0) return defaultState
 
-  if (tm % tq === 0) {
-    return { ...defaultState, mcq: { count: tq, marks: Math.floor(tm / tq) } }
+  // With MSQ and Numerical removed, we distribute all questions to MCQ.
+  // The marks per question will be base marks (at least 1).
+  const baseMarks = Math.floor(tm / tq) || 1
+  return {
+    ...defaultState,
+    mcq: { count: tq, marks: baseMarks }
   }
-
-  const baseMarks = Math.floor(tm / tq)
-  if (baseMarks === 0) {
-    return { ...defaultState, mcq: { count: tq, marks: 1 } }
-  }
-
-  const msqCount = tm - (tq * baseMarks)
-  const mcqCount = tq - msqCount
-
-  if (mcqCount > 0 && msqCount > 0) {
-    return {
-      ...defaultState,
-      mcq: { count: mcqCount, marks: baseMarks },
-      msq: { count: msqCount, marks: baseMarks + 1 }
-    }
-  }
-
-  return { ...defaultState, mcq: { count: tq, marks: baseMarks } }
 }
 
 const useWizardStore = create((set, get) => ({

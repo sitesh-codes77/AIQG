@@ -44,20 +44,34 @@ export default function Step1ContentSelection({ data, onChange }) {
   const toggleBook = (bookObj) => {
     const currentBooks = data.books || []
     const exists = currentBooks.some(b => b.id === bookObj.id)
-    const newBooks = exists
-      ? currentBooks.filter(b => b.id !== bookObj.id)
-      : [...currentBooks, bookObj]
-    // When book set changes, clear chapter selections
-    onChange({ ...data, books: newBooks, chapters: [], chapterMap: {} })
+
+    if (exists) {
+      // REMOVING a book — only remove chapters belonging to this book
+      const newBooks = currentBooks.filter(b => b.id !== bookObj.id)
+      const removedBookId = bookObj.id
+      const chaptersOfRemovedBook = new Set(
+        chapters.filter(c => c.bookId === removedBookId).map(c => c.id)
+      )
+      const newChapterIds = (data.chapters || []).filter(id => !chaptersOfRemovedBook.has(id))
+      const newMap = { ...data.chapterMap }
+      for (const id of chaptersOfRemovedBook) delete newMap[id]
+      onChange({ ...data, books: newBooks, chapters: newChapterIds, chapterMap: newMap })
+    } else {
+      // ADDING a book — keep existing chapters untouched
+      const newBooks = [...currentBooks, bookObj]
+      onChange({ ...data, books: newBooks })
+    }
   }
 
   const toggleAllBooks = () => {
     const allSelected = allBooks.length > 0 && (data.books || []).length === allBooks.length
     if (allSelected) {
+      // Deselect all — clear everything
       onChange({ ...data, books: [], chapters: [], chapterMap: {} })
     } else {
+      // Select all — keep existing chapters (they still belong to valid books)
       const allBookObjs = allBooks.map(b => ({ id: b.id, label: b.label }))
-      onChange({ ...data, books: allBookObjs, chapters: [], chapterMap: {} })
+      onChange({ ...data, books: allBookObjs })
     }
   }
 

@@ -8,8 +8,6 @@ import ChapterModal from './ChapterModal'
 
 export const Q_TYPES = [
   { key: 'mcq', label: 'MCQ', description: 'Multiple Choice – Single Answer', defaultMarks: 1, maxMarks: 10 },
-  { key: 'msq', label: 'MSQ', description: 'Multiple Select – Multi Answer', defaultMarks: 2, maxMarks: 10 },
-  { key: 'numerical', label: 'Numerical', description: 'Number input answers', defaultMarks: 4, maxMarks: 20 },
   { key: 'short', label: 'Short Answer', description: '2–3 sentence answers', defaultMarks: 3, maxMarks: 10 },
   { key: 'long', label: 'Long Answer', description: 'Essay-type detailed answers', defaultMarks: 5, maxMarks: 20 },
 ]

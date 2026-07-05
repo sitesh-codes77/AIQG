@@ -247,3 +247,22 @@ input[type=number] { -moz-appearance: textfield; }
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ── Avatar Dropdown Animation ─────────────────────────── */
+@keyframes avatarDropdownIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Drawer Slide-in Animation ─────────────────────────── */
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Preview Split-screen Responsive ───────────────────── */
+@media (max-width: 768px) {
+  .preview-pdf-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

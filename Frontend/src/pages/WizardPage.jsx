@@ -15,6 +15,7 @@ import AsyncGenerateModal from '../components/wizard/AsyncGenerateModal'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import { step1Schema, step2Schema, validateStep3 } from '../store/validation'
+import { isPrime } from '../utils/isPrime'
 
 
 /* ── Wizard Page ────────────────────────────────────────── */
@@ -55,21 +56,23 @@ export default function WizardPage() {
     } else if (step === 2) {
       const targetMarks = Number(step2.totalMarks) || 0
       const targetQuestions = Number(step2.totalQuestions) || 0
+
+      // Prime number gate — blocks progression if Total Marks is prime
+      if (targetMarks > 0 && isPrime(targetMarks)) {
+        showToast('Please enter a non-prime number for Total Marks to ensure even question distribution.', 'error')
+        return false
+      }
       
       const mcqMarks = (step2.mcq?.count ?? 0) * (step2.mcq?.marks ?? 1)
-      const msqMarks = (step2.msq?.count ?? 0) * (step2.msq?.marks ?? 2)
-      const numericalMarks = (step2.numerical?.count ?? 0) * (step2.numerical?.marks ?? 4)
       const shortMarks = (step2.short?.count ?? 0) * (step2.short?.marks ?? 3)
       const longMarks = (step2.long?.count ?? 0) * (step2.long?.marks ?? 5)
       
       const mcqCount = (step2.mcq?.count ?? 0)
-      const msqCount = (step2.msq?.count ?? 0)
-      const numericalCount = (step2.numerical?.count ?? 0)
       const shortCount = (step2.short?.count ?? 0)
       const longCount = (step2.long?.count ?? 0)
 
-      const allocatedMarks = mcqMarks + msqMarks + numericalMarks + shortMarks + longMarks
-      const allocatedQuestions = mcqCount + msqCount + numericalCount + shortCount + longCount
+      const allocatedMarks = mcqMarks + shortMarks + longMarks
+      const allocatedQuestions = mcqCount + shortCount + longCount
 
       const errors = []
 

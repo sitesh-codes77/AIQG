@@ -11,7 +11,7 @@ const steps = [
   {
     title: "Composition Setup",
     description:
-      "Customize the perfect ratio of MCQs, MSQs, short answers, and long answers along with marks weightage.",
+      "Customize the perfect ratio of MCQs, short answers, and long answers along with marks weightage.",
   },
   {
     title: "Difficulty Distribution",
@@ -22,6 +22,11 @@ const steps = [
     title: "AI Composition & Review",
     description:
       "Let AI synthesize and polish the questions, scan for duplicates, check for clarity, and output your print-ready paper.",
+  },
+  {
+    title: "Paper Ready",
+    description:
+      "Your polished, exam-ready question paper is generated and available for instant download or preview.",
   },
 ];
 
@@ -109,7 +114,7 @@ export default function TimelineSection() {
             margin: "0 auto",
           }}
         >
-          Generate balanced, high-quality assessment papers in four simple
+          Generate balanced, high-quality assessment papers in a few simple
           steps.
         </p>
       </div>

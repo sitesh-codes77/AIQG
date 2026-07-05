@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import useWizardStore from "../store/useWizardStore";
+import useAuthStore from "../store/useAuthStore";
 import Rhero from "../assets/RHero.PNG";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
@@ -37,6 +38,7 @@ const features = [
 export default function LandingPage() {
   const navigate = useNavigate();
   const isDark = useWizardStore((s) => s.isDark);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <div
@@ -149,7 +151,7 @@ export default function LandingPage() {
               }}
             >
               <button
-                onClick={() => navigate("/login")}
+                onClick={() => navigate(isAuthenticated ? "/generator" : "/login")}
                 style={{
                   background:
                     "linear-gradient(135deg,var(--primary),color-mix(in srgb,var(--primary) 80%,#000))",
@@ -206,7 +208,7 @@ export default function LandingPage() {
                   e.currentTarget.style.color = "var(--text-2)";
                 }}
               >
-                Watch Demo
+                Watch Flow
               </button>
             </motion.div>
           </div>

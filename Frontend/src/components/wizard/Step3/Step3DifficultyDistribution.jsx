@@ -42,54 +42,71 @@ export default function Step3DifficultyDistribution({
   useEffect(() => {
     if (activeTypes.length === 0 || activeChapters.length === 0) return;
 
-    const isEmpty = activeChapters.every((ch) => {
-      const chData = data[ch];
-      if (!chData) return true;
-      return activeTypes.every((t) => {
-        const typeData = chData[t.key];
-        if (!typeData) return true;
-        return (
-          typeData.easy === 0 && typeData.medium === 0 && typeData.hard === 0
-        );
+    const newData = { ...data };
+    let hasChanges = false;
+
+    // Ensure every active chapter has an entry in newData
+    activeChapters.forEach((ch) => {
+      if (!newData[ch]) {
+        newData[ch] = {};
+        hasChanges = true;
+      }
+    });
+
+    activeTypes.forEach((type) => {
+      const typeConfig = step2Data[type.key] || {};
+      const totalCount = typeConfig.count || 0;
+      const alloc = typeConfig.chapterAlloc || {};
+
+      activeChapters.forEach((ch, idx) => {
+        let chapterTarget = alloc[ch];
+        if (chapterTarget === undefined) {
+          const perCh = Math.floor(totalCount / activeChapters.length);
+          const rem = totalCount % activeChapters.length;
+          chapterTarget = idx === 0 ? perCh + rem : perCh;
+        }
+
+        const currentDist = (newData[ch] || {})[type.key] || { easy: 0, medium: 0, hard: 0 };
+        const currentSum = (Number(currentDist.easy) || 0) + (Number(currentDist.medium) || 0) + (Number(currentDist.hard) || 0);
+
+        if (currentSum !== chapterTarget) {
+          hasChanges = true;
+          let newEasy = chapterTarget - (Number(currentDist.medium) || 0) - (Number(currentDist.hard) || 0);
+          let newMedium = Number(currentDist.medium) || 0;
+          let newHard = Number(currentDist.hard) || 0;
+
+          if (newEasy < 0) {
+            newEasy = chapterTarget;
+            newMedium = 0;
+            newHard = 0;
+          }
+
+          newData[ch] = {
+            ...newData[ch],
+            [type.key]: {
+              easy: newEasy,
+              medium: newMedium,
+              hard: newHard,
+            },
+          };
+        }
       });
     });
 
-    if (isEmpty) {
-      const newData = { ...data };
-      let hasChanges = false;
+    // Also clean up any stale types that are no longer active
+    activeChapters.forEach((ch) => {
+      if (newData[ch]) {
+        Object.keys(newData[ch]).forEach((typeKey) => {
+          if (!activeTypes.some(t => t.key === typeKey)) {
+            delete newData[ch][typeKey];
+            hasChanges = true;
+          }
+        });
+      }
+    });
 
-      activeChapters.forEach((ch) => {
-        if (!newData[ch]) newData[ch] = {};
-      });
-
-      activeTypes.forEach((type) => {
-        const typeConfig = step2Data[type.key] || {};
-        const totalCount = typeConfig.count || 0;
-        const alloc = typeConfig.chapterAlloc || {};
-
-        if (totalCount > 0) {
-          hasChanges = true;
-          activeChapters.forEach((ch, idx) => {
-            let chapterTarget = alloc[ch];
-            if (chapterTarget === undefined) {
-              const perCh = Math.floor(totalCount / activeChapters.length);
-              const rem = totalCount % activeChapters.length;
-              chapterTarget = idx === 0 ? perCh + rem : perCh;
-            }
-
-            newData[ch] = {
-              ...newData[ch],
-              [type.key]: {
-                easy: chapterTarget, // Default pushes all questions to Easy initially
-                medium: 0,
-                hard: 0,
-              },
-            };
-          });
-        }
-      });
-
-      if (hasChanges) onUpdate(newData);
+    if (hasChanges) {
+      onUpdate(newData);
     }
   }, [chapters, step2Data]);
 
