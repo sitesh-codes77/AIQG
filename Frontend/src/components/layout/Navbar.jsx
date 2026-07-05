@@ -1,11 +1,55 @@
 import { useNavigate } from 'react-router-dom'
-import { NotebookText, ChevronRight } from 'lucide-react'
+import { NotebookText, ChevronRight, LogOut } from 'lucide-react'
 import ThemeToggle from '../ThemeToggle'
 import useWizardStore from '../../store/useWizardStore'
+import useAuthStore from '../../store/useAuthStore'
 
 export default function Navbar({ variant = 'landing', currentStep, totalSteps, stepLabel }) {
   const navigate = useNavigate()
   const isDark = useWizardStore((s) => s.isDark)
+  const { isAuthenticated, user, logout } = useAuthStore()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  // ── Logout button (reused across variants) ──
+  const LogoutButton = () => (
+    <button
+      onClick={handleLogout}
+      title="Logout"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        backgroundColor: 'var(--danger)',
+        border: '1.5px solid var(--danger)',
+        borderRadius: '8px',
+        padding: '7px 14px',
+        color: '#fff',
+        fontSize: '0.8rem',
+        fontWeight: 600,
+        cursor: 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 2px 8px rgba(239,68,68,0.25)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = '#dc2626'
+        e.currentTarget.style.borderColor = '#dc2626'
+        e.currentTarget.style.boxShadow = '0 4px 14px rgba(239,68,68,0.4)'
+        e.currentTarget.style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = 'var(--danger)'
+        e.currentTarget.style.borderColor = 'var(--danger)'
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(239,68,68,0.25)'
+        e.currentTarget.style.transform = 'none'
+      }}
+    >
+      <LogOut size={14} /> Logout
+    </button>
+  )
 
   if (variant === 'wizard') {
     return (
@@ -25,6 +69,12 @@ export default function Navbar({ variant = 'landing', currentStep, totalSteps, s
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {isAuthenticated && user && (
+            <span style={{ color: 'var(--text-3)', fontSize: '0.78rem', fontWeight: 500, marginRight: '4px' }}>
+              {user.username}
+            </span>
+          )}
+          <LogoutButton />
           <ThemeToggle />
         </div>
       </div>
@@ -59,6 +109,7 @@ export default function Navbar({ variant = 'landing', currentStep, totalSteps, s
           >
             New Paper <ChevronRight size={13} />
           </button>
+          <LogoutButton />
           <ThemeToggle />
         </div>
       </div>
@@ -115,31 +166,42 @@ export default function Navbar({ variant = 'landing', currentStep, totalSteps, s
 
         {/* Right actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            onClick={() => navigate("/login")}
-            style={{
-              backgroundColor: "var(--primary)",
-              border: "1.5px solid var(--primary)",
-              color: "#fff",
-              borderRadius: "999px",
-              padding: "8px 24px",
-              fontWeight: 600,
-              fontSize: "0.85rem",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 0 20px var(--primary-glow)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "none"
-            }}
-          >
-            Login <ChevronRight size={13} />
-          </button>
+          {isAuthenticated ? (
+            <>
+              {user && (
+                <span style={{ color: 'var(--text-2)', fontSize: '0.85rem', fontWeight: 500 }}>
+                  {user.username}
+                </span>
+              )}
+              <LogoutButton />
+            </>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              style={{
+                backgroundColor: "var(--primary)",
+                border: "1.5px solid var(--primary)",
+                color: "#fff",
+                borderRadius: "999px",
+                padding: "8px 24px",
+                fontWeight: 600,
+                fontSize: "0.85rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 20px var(--primary-glow)"
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "none"
+              }}
+            >
+              Login <ChevronRight size={13} />
+            </button>
+          )}
           <ThemeToggle />
         </div>
       </div>

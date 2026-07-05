@@ -1,41 +1,74 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Eye,
   EyeOff,
-  Phone,
+  Mail,
   Lock,
-  User,
   ArrowRight,
   NotebookText,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "../components/ThemeToggle";
+import useAuthStore from "../store/useAuthStore";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: "", phone: "", password: "" });
+  const { login, isLoading, error, clearError } = useAuthStore();
+
+  const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [focused, setFocused] = useState("");
+  const [validationError, setValidationError] = useState("");
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/generator");
+    if (error) clearError();
+    if (validationError) setValidationError("");
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Client-side validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      setValidationError("Please enter a valid email address");
+      return;
+    }
+    if (form.password.length < 1) {
+      setValidationError("Password is required");
+      return;
+    }
+
+    const result = await login({
+      email: form.email.trim().toLowerCase(),
+      password: form.password,
+    });
+
+    if (result.success) {
+      navigate("/generator");
+    }
+  };
+
+  const displayError = validationError || error;
 
   const inputStyle = (field) => ({
     width: "100%",
     backgroundColor: "var(--input-bg)",
-    border: `1.5px solid ${focused === field ? "#0EA5E9" : "var(--input-border)"}`,
+    border: `1.5px solid ${
+      focused === field ? "var(--primary)" : "var(--input-border)"
+    }`,
     borderRadius: "10px",
     padding: "11px 14px 11px 42px",
     color: "var(--text-1)",
     fontSize: "0.9rem",
     outline: "none",
     transition: "border-color 0.2s, box-shadow 0.2s",
-    boxShadow: focused === field ? "0 0 0 3px rgba(14,165,233,0.15)" : "none",
+    boxShadow:
+      focused === field ? "0 0 0 3px var(--primary-dim)" : "none",
+    fontFamily: "inherit",
   });
 
   return (
@@ -79,8 +112,10 @@ export default function LoginPage() {
           transition: "color 0.2s",
           zIndex: 10,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "#0EA5E9")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-3)")}
+        onMouseEnter={(e) => (e.currentTarget.style.color = "var(--primary)")}
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.color = "var(--text-3)")
+        }
       >
         ← Back to Home
       </button>
@@ -107,7 +142,7 @@ export default function LoginPage() {
           width: "500px",
           height: "500px",
           background:
-            "radial-gradient(circle,rgba(99,102,241,0.06) 0%,transparent 65%)",
+            "radial-gradient(circle,rgba(129,140,248,0.06) 0%,transparent 65%)",
           borderRadius: "50%",
           pointerEvents: "none",
         }}
@@ -149,7 +184,7 @@ export default function LoginPage() {
                 marginBottom: "1.1rem",
               }}
             >
-              <NotebookText size={22} color="#1aaaedff" />
+              <NotebookText size={22} color="var(--primary)" />
               <span
                 style={{
                   fontWeight: 800,
@@ -186,71 +221,87 @@ export default function LoginPage() {
             }}
           />
 
+          {/* Error message */}
+          <AnimatePresence>
+            {displayError && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, height: 0 }}
+                animate={{ opacity: 1, y: 0, height: "auto" }}
+                exit={{ opacity: 0, y: -8, height: 0 }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 14px",
+                  backgroundColor: "var(--danger-dim)",
+                  border: "1px solid rgba(239,68,68,0.2)",
+                  borderRadius: "10px",
+                  marginBottom: "1.1rem",
+                  color: "var(--danger)",
+                  fontSize: "0.83rem",
+                  fontWeight: 500,
+                }}
+              >
+                <AlertCircle size={15} style={{ flexShrink: 0 }} />
+                {displayError}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <form
             onSubmit={handleSubmit}
             style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}
           >
-            {[
-              {
-                name: "name",
-                label: "Full Name",
-                type: "text",
-                Icon: User,
-                placeholder: "e.g. Dr. Anika Sharma",
-              },
-              {
-                name: "phone",
-                label: "Phone Number",
-                type: "tel",
-                Icon: Phone,
-                placeholder: "+91 98765 43210",
-              },
-            ].map(({ name, label, type, Icon, placeholder }) => (
-              <div key={name}>
-                <label
+            {/* Email */}
+            <div>
+              <label
+                htmlFor="email"
+                style={{
+                  display: "block",
+                  color: "var(--text-3)",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  marginBottom: "5px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.07em",
+                }}
+              >
+                Email Address
+              </label>
+              <div style={{ position: "relative" }}>
+                <Mail
+                  size={15}
+                  color={
+                    focused === "email" ? "var(--primary)" : "var(--text-3)"
+                  }
                   style={{
-                    display: "block",
-                    color: "var(--text-3)",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    marginBottom: "5px",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.07em",
+                    position: "absolute",
+                    left: "13px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    transition: "color 0.2s",
                   }}
-                >
-                  {label}
-                </label>
-                <div style={{ position: "relative" }}>
-                  <Icon
-                    size={15}
-                    color={focused === name ? "#0EA5E9" : "var(--text-3)"}
-                    style={{
-                      position: "absolute",
-                      left: "13px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      transition: "color 0.2s",
-                    }}
-                  />
-                  <input
-                    id={name}
-                    type={type}
-                    name={name}
-                    placeholder={placeholder}
-                    value={form[name]}
-                    onChange={handleChange}
-                    onFocus={() => setFocused(name)}
-                    onBlur={() => setFocused("")}
-                    style={inputStyle(name)}
-                    required
-                  />
-                </div>
+                />
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  onFocus={() => setFocused("email")}
+                  onBlur={() => setFocused("")}
+                  style={inputStyle("email")}
+                  required
+                  autoComplete="email"
+                />
               </div>
-            ))}
+            </div>
 
             {/* Password */}
             <div>
               <label
+                htmlFor="password"
                 style={{
                   display: "block",
                   color: "var(--text-3)",
@@ -266,7 +317,11 @@ export default function LoginPage() {
               <div style={{ position: "relative" }}>
                 <Lock
                   size={15}
-                  color={focused === "password" ? "#0EA5E9" : "var(--text-3)"}
+                  color={
+                    focused === "password"
+                      ? "var(--primary)"
+                      : "var(--text-3)"
+                  }
                   style={{
                     position: "absolute",
                     left: "13px",
@@ -286,6 +341,7 @@ export default function LoginPage() {
                   onBlur={() => setFocused("")}
                   style={{ ...inputStyle("password"), paddingRight: "42px" }}
                   required
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -305,7 +361,7 @@ export default function LoginPage() {
                     transition: "color 0.2s",
                   }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.color = "#0EA5E9")
+                    (e.currentTarget.style.color = "var(--primary)")
                   }
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.color = "var(--text-3)")
@@ -316,55 +372,60 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div style={{ textAlign: "right", marginTop: "-0.3rem" }}>
-              <button
-                type="button"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#0EA5E9",
-                  fontSize: "0.8rem",
-                  cursor: "pointer",
-                  fontWeight: 500,
-                }}
-              >
-                Forgot password?
-              </button>
-            </div>
-
             <button
-              id="accessGeneratorBtn"
+              id="loginBtn"
               type="submit"
+              disabled={isLoading}
               style={{
                 width: "100%",
-                background: "linear-gradient(135deg,#0EA5E9,#0284C7)",
+                background: isLoading
+                  ? "var(--border)"
+                  : "linear-gradient(135deg,var(--primary),color-mix(in srgb,var(--primary) 80%,#000))",
                 color: "#fff",
                 border: "none",
                 borderRadius: "10px",
                 padding: "13px",
                 fontSize: "0.95rem",
                 fontWeight: 700,
-                cursor: "pointer",
+                cursor: isLoading ? "not-allowed" : "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: "7px",
-                boxShadow: "0 4px 18px rgba(14,165,233,0.3)",
+                boxShadow: isLoading
+                  ? "none"
+                  : "0 4px 18px var(--primary-dim)",
                 transition: "all 0.2s",
                 marginTop: "0.4rem",
+                opacity: isLoading ? 0.7 : 1,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 8px 24px rgba(14,165,233,0.45)";
+                if (!isLoading) {
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 8px 24px var(--primary-glow)";
+                }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "none";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 18px rgba(14,165,233,0.3)";
+                e.currentTarget.style.boxShadow = isLoading
+                  ? "none"
+                  : "0 4px 18px var(--primary-dim)";
               }}
             >
-              Access Generator <ArrowRight size={17} />
+              {isLoading ? (
+                <>
+                  <Loader2
+                    size={17}
+                    style={{ animation: "spin 1s linear infinite" }}
+                  />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  Sign In <ArrowRight size={17} />
+                </>
+              )}
             </button>
           </form>
 
@@ -377,17 +438,22 @@ export default function LoginPage() {
             }}
           >
             Don't have an account?{" "}
-            <button
+            <Link
+              to="/signup"
               style={{
-                background: "none",
-                border: "none",
-                color: "#0EA5E9",
-                cursor: "pointer",
+                color: "var(--primary)",
                 fontWeight: 600,
+                textDecoration: "none",
               }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.textDecoration = "underline")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.textDecoration = "none")
+              }
             >
-              Contact Admin
-            </button>
+              Sign Up
+            </Link>
           </p>
         </motion.div>
       </div>

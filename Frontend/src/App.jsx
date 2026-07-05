@@ -3,9 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import useWizardStore from './store/useWizardStore'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
 import WizardPage from './pages/WizardPage'
 import NotFoundPage from './pages/NotFoundPage'
 import PreviewPage from './pages/PreviewPage'
+import ProtectedRoute from './components/ProtectedRoute'
 import './index.css'
 
 function App() {
@@ -22,8 +24,17 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/generator" element={<WizardPage />} />
-        <Route path="/preview" element={<PreviewPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/generator" element={
+          <ProtectedRoute>
+            <WizardPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/preview" element={
+          <ProtectedRoute>
+            <PreviewPage />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
